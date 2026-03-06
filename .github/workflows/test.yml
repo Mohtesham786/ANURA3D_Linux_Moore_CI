@@ -30,7 +30,9 @@ jobs:
       - name: Build Fortran code using Makefile
         run: |
           cd src
-          make
+          make clean || true
+          make fortran_compiler=ifx 2>&1 | tee build.log
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -43,9 +45,8 @@ jobs:
 
       - name: Run Benchmark wave_small
         run: |
-          cd src
-          chmod +x Anura3D.out
-          ./Anura3D.out ../Benchmarks/wave/wave_small
+          cd Benchmarks/wave
+          ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log
       
       # Structure to save a file
       # - name: Upload output file
