@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{5981CACF-B133-49CD-A4B1-FB8BD7983C3F}">
+	<Platforms>
+		<Platform Name="x64"/>
+	</Platforms>
+	<Configurations>
+		<Configuration Name="Debug|x64" UseCompiler="ifortCompiler" OutputDirectory="Debug" IntermediateDirectory="Debug" TargetName="$(ProjectName)_2023">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" BufferedIO="true" Preprocess="preprocessYes" PreprocessorDefinitions="Debug;" ReentrantCode="reentrancyThreaded" SourceFileFormat="fileFormatFree" FixedFormLineLength="fixedLength132" Diagnostics="diagnosticsShowAll" RealKIND="realKIND8" LocalVariableStorage="localStorageAutomatic" FloatingPointExceptionHandling="fpe0" FloatingPointModel="strict" ExtendSinglePrecisionConstants="true" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" DescriptorDataTypeCheck="true" DescriptorDataSizeCheck="true" StackFrameCheck="true" UseMkl="mklSequential"/>
+			<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" StackReserveSize="100000000" InterproceduralOptimizations="false"/>
+			<Tool Name="VFResourceCompilerTool" ShowProgress="true"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool" CommandLine="LIB /OUT:&quot;Debug\DynamicMPM.lib&quot;  Debug\*.obj"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+			<Tool Name="VFManifestTool" SuppressStartupBanner="true"/>
+		</Configuration>
+		<Configuration Name="Release|x64" UseCompiler="ifortCompiler" OutputDirectory="Release" IntermediateDirectory="Release" TargetName="$(ProjectName)_2023">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" BufferedIO="true" Preprocess="preprocessYes" PreprocessorDefinitions="Release;" ReentrantCode="reentrancyThreaded" SourceFileFormat="fileFormatFree" FixedFormLineLength="fixedLength132" Diagnostics="diagnosticsShowAll" RealKIND="realKIND8" LocalVariableStorage="localStorageAutomatic" FloatingPointModel="strict" ExtendSinglePrecisionConstants="true" UseMkl="mklSequential"/>
+			<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" StackReserveSize="100000000" InterproceduralOptimizations="false" AdditionalDependencies="gidpost.lib hdf5.lib zlib.lib hdf5d.lib gidpostd.lib"/>
+			<Tool Name="VFResourceCompilerTool" ShowProgress="true"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool" CommandLine="LIB /OUT:&quot;Release\DynamicMPM.lib&quot;  Release\*.obj"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool" CommandLine="copy &quot;$(TargetDir)SoilModels\*.dll&quot; &quot;$(SolutionDir)Release\&quot;"/>
+			<Tool Name="VFManifestTool" SuppressStartupBanner="true"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="src">
+			<File RelativePath="..\src\A3DLinearElasticity.f90"/>
+			<File RelativePath="..\src\AdjustParticleDiscretisation.f90"/>
+			<File RelativePath="..\src\Anura3D.f90"/>
+			<File RelativePath="..\src\BuildBJacDet.f90"/>
+			<File RelativePath="..\src\BuildDElastic.f90"/>
+			<File RelativePath="..\src\BuildLoad.f90"/>
+			<File RelativePath="..\src\Counters.f90"/>
+			<File RelativePath="..\src\ElemCalc.f90"/>
+			<File RelativePath="..\src\ElemCalcQUAD.f90"/>
+			<File RelativePath="..\src\ElemCalcTETRA.f90"/>
+			<File RelativePath="..\src\ElemCalcTRI.f90"/>
+			<File RelativePath="..\src\ElemConnections.f90"/>
+			<File RelativePath="..\src\ErrorHandler.f90"/>
+			<File RelativePath="..\src\ExternalSoilModel.f90"/>
+			<File RelativePath="..\src\Feedback.f90"/>
+			<File RelativePath="..\src\FileIO.f90"/>
+			<File RelativePath="..\src\GeoMath.f90"/>
+			<File RelativePath="..\src\GetPrinStress.f90"/>
+			<File RelativePath="..\src\GetStrain.f90"/>
+			<File RelativePath="..\src\getversion.f90"/>
+			<File RelativePath="..\src\GlobalConstants.f90"/>
+			<File RelativePath="..\src\InitialiseElementType.f90"/>
+			<File RelativePath="..\src\InitialiseKernel.f90"/>
+			<File RelativePath="..\src\ISORT.f90"/>
+			<File RelativePath="..\src\Kernel.f90"/>
+			<File RelativePath="..\src\LagrangianPhase.f90"/>
+			<File RelativePath="..\src\Liquid.f90"/>
+			<File RelativePath="..\src\MatrixMath.f90"/>
+			<File RelativePath="..\src\MCSS_Soil_Model.f90"/>
+			<File RelativePath="..\src\MeshInfo.f90"/>
+			<File RelativePath="..\src\MPMConvPhase.f90"/>
+			<File RelativePath="..\src\MPMData.f90"/>
+			<File RelativePath="..\src\MPMDYN2PhaseSP.f90"/>
+			<File RelativePath="..\src\MPMDYN3PhaseSP.f90"/>
+			<File RelativePath="..\src\MPMDynamicExplicit.f90"/>
+			<File RelativePath="..\src\MPMDYNBTSig.f90"/>
+			<File RelativePath="..\src\MPMDynContact.f90"/>
+			<File RelativePath="..\src\MPMDYNConvPhase.f90"/>
+			<File RelativePath="..\src\MPMDYNStresses.f90"/>
+			<File RelativePath="..\src\MPMDynViscousBoundary.f90"/>
+			<File RelativePath="..\src\MPMEmptyElements.f90"/>
+			<File RelativePath="..\src\MPMExcavation.f90"/>
+			<File RelativePath="..\src\MPMInit.f90"/>
+			<File RelativePath="..\src\MPMMeshAdjustment.f90"/>
+			<File RelativePath="..\src\MPMStrainSmoothing.f90"/>
+			<File RelativePath="..\src\MPMStresses.f90"/>
+			<File RelativePath="..\src\Particle.f90"/>
+			<File RelativePath="..\src\ReadCalculationData.f90"/>
+			<File RelativePath="..\src\ReadGeometryData.f90"/>
+			<File RelativePath="..\src\ReadMaterialData.f90"/>
+			<File RelativePath="..\src\ReadMPMData.f90"/>
+			<File RelativePath="..\src\RigidBody.f90"/>
+			<File RelativePath="..\src\RotBoundCond.f90"/>
+			<File RelativePath="..\src\String.f90"/>
+			<File RelativePath="..\src\timing.f90"/>
+			<File RelativePath="..\src\TwoLayerFormulation.f90"/>
+			<File RelativePath="..\src\WriteMPMData.f90"/>
+			<File RelativePath="..\src\WriteNodalData.f90"/>
+			<File RelativePath="..\src\WriteResultData.f90"/>
+			<File RelativePath="..\src\WriteTestData.f90"/>
+			<File RelativePath="..\src\WriteVTK2Layer.f90"/>
+			<File RelativePath="..\src\WriteVTKASCII.f90"/>
+			<File RelativePath="..\src\WriteVTKBinary.f90"/>
+			<File RelativePath="..\src\WriteVTKOutput.f90"/>
+		</Filter>
+	</Files>
+	<Globals/>
+</VisualStudioProject>

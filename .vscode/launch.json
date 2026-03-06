@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "(gdb) Fortran",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/src/Anura3D.out",
+        "args": ["column_collapse_triag_v1_3"], // Possible input args for a.out
+        "stopAtEntry": true,
+        "justMyCode": false,
+        "cwd": "/home/sandbiter/Documents/Geotech_Research/linux_testing/column_collapse/column_collapse_triag_v1_3.A3D",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true,
+          },
+        ],
+      },
+    ],
+  }

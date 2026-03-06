@@ -1,0 +1,74 @@
+#....................................................definicion general de compilacion
+ comp = ifort     -c   -align dcommons   -no-vec -extend-source 132          
+
+#....................................................linea para linkar en serie
+ link = ifort    -lc 
+
+#....................................................grupo de archivos con posible optimizacion -O2
+OBJ1 =  Counters.o\
+	AdjustParticleDiscretisation.o\
+	CalculationData.o\
+	DVF_UNIT_VS.o\
+	DynamicMPMTimeStep.o\
+	ElmAdjac.o\
+	ElmEval.o\
+	ElmEvalT.o\
+	FILEIO.o\
+	Fluid.o\
+	FORMB3D.o\
+	FORMDE.o\
+	FORMLOAD.o\
+	GeoMath.o\
+	GETEPS.o\
+	GlobalConstants.o\
+	HPmodel.o\
+	ICHModel.o\
+	ISORT.o\
+	MaterialData.o\
+	MatrixMath.o\
+	MeshData.o\
+	MOHR.o\
+	MOHR_StrainSoftening.o\
+	MPMConvPhase.o\
+	MPMData.o\
+	MPMDyn3DPlate.o\
+	MPMDYNBTSig.o\
+	MPMDYNConsolidation.o\
+	MPMDynContact.o\
+	MPMDYNConvPhase.o\
+	MPMDynMembrane.o\
+	MPMDYNStresses.o\
+	MPMDYNUnsatConsolidation.o\
+	MPMDynViscousBoundary.o\
+	MPMEmptyElements.o\
+	MPMHeat.o\
+	MPMInit.o\
+	MPMMeshAdjustment.o\
+	MPMPartGrid.o\
+	MPMStrainSmoothing.o\
+	MPMStresses.o\
+	MZERO.o\
+	Particle.o\
+	PRNSTR.o\
+	RDMPMData.o\
+	ReadMeshData.o\
+	RotatedBC.o\
+	StructureTrajectory.o\
+	WriteBin.o\
+	WriteResultData.o\
+	WTMPMData.o\
+	WTMPMTest.o
+	
+
+
+
+
+#...................................................code_bright se hace asi:
+
+dinamicmpm.exe: $(OBJ1) 
+	$(link) -o $@ $(OBJ1) 
+
+#..........................................opciones de compilacion por grupos de subrutinas
+$(OBJ1):
+	$(comp) -O2  $*.f90
+

@@ -1,0 +1,61 @@
+# *.dll
+*.mod
+*.o
+# *.suo
+*.exe
+# *.obj
+# *.htm
+src/VS/Release/**
+src/VS/Debug/**
+src/VS/*.user
+src/VS/Debug/BuildLog.htm
+GiD_Files/GiD_Problemtype/Anura3D_2023.gid/dll/**
+src/MaterialModels/**
+src/OutputModules/**
+src/Shared/**
+VS/Debug/**
+*_genmod*
+*genmod*
+*genmod*.f90
+
+src/VS/.vs/Anura3D/v16
+*.dll
+*.bat
+*.avi
+*.pptx
+*.INF
+*.MLG
+*.ENG
+*.vtk
+*.BMR
+*.BMS
+*.BRF_*
+*.obj
+*.suo
+*.pdb
+*ilk
+*.sqlite
+*.pdb
+*.u2d
+
+VS/CreateCPS
+# Ignore all cps files except the first
+*.cps*
+!*.cps_001
+*.GIP*
+*.OUT
+*.PAR*
+*.TST
+*.RX
+*.dat
+*.geo
+*.lin
+*.OPD
+*.spd
+*.mod
+
+# VS code debugger
+.vs/**
+
+# Include the expected outputs for the bechmarks
+!Benchamrks/*expected*.ENG
