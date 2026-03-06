@@ -20,6 +20,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        
+      - name: Build Docker image
+        run: |
+          docker build -t anura3d-ci .
     
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
