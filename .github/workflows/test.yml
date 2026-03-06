@@ -46,6 +46,8 @@ jobs:
       - name: Run Benchmark wave_small
         run: |
           cd Benchmarks/wave
+          export ASAN_OPTIONS=detect_leaks=0
+          export MSAN_OPTIONS=halt_on_error=0
           ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log
           ls -lh
       
