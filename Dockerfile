@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     gpg \
     ca-certificates \
     make \
-    python3 \
+    python3.10 \
+    python3.10-distutils \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
@@ -27,7 +28,7 @@ SHELL ["/bin/bash", "-lc"]
 WORKDIR /workspace
 
 COPY requirements.txt /workspace/requirements.txt
-RUN pip3 install --break-system-packages -r /workspace/requirements.txt
+RUN python3.10 -m pip install --break-system-packages -r /workspace/requirements.txt
 
 COPY . /workspace
 
