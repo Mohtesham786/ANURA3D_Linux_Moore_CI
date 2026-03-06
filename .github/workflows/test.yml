@@ -49,6 +49,13 @@ jobs:
           ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log
           ls -lh
       
+      - name: Upload wave benchmark outputs
+        uses: actions/upload-artifact@v4
+        with:
+         name: wave-benchmark-output
+         path: |
+           Benchmarks/wave/*
+      
       # Structure to save a file
       # - name: Upload output file
       #   uses: actions/upload-artifact@v3
