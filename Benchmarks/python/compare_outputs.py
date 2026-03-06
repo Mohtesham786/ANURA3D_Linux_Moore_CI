@@ -111,7 +111,7 @@ def run_comparisons():
 
     # Path relative to the Benchmark folder
     test_cases = [
-        ("wave/wave_small_001.ENG", "wave/wave_small_001_expected.ENG")
+        ("wave/wave_small.GOM", "wave/wave_small_expected.GOM")
 
         # Add more test cases as needed
     ]
