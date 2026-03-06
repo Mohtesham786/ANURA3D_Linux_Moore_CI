@@ -122,7 +122,7 @@ def run_comparisons():
         actual_file = os.path.join(benchmark_folder_path, actual_file)
         expected_file = os.path.join(benchmark_folder_path, expected_file)
 
-        passed, message = compare_file_as_dfs(actual_file, expected_file)
+        passed, message = compare_files(actual_file, expected_file)
 
         print(f"Comparing {actual_file} with {expected_file}:")
         print(f"  {'PASSED' if passed else 'FAILED'}: {message}")
