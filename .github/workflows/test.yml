@@ -47,6 +47,7 @@ jobs:
         run: |
           cd Benchmarks/wave
           ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log
+          ls -lh
       
       # Structure to save a file
       # - name: Upload output file
