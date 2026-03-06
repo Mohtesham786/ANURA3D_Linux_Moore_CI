@@ -65,8 +65,8 @@ jobs:
       #     name: output-file
       #     path: Benchmarks/wave/wave_small_001.ENG
 
-      #- name: Compare Benchmark results
-      #  run: |
-      #    cd Benchmarks/python
-      #    python compare_outputs.py
+      - name: Compare Benchmark results
+        run: |
+          cd Benchmarks/python
+          python compare_outputs.py
 
