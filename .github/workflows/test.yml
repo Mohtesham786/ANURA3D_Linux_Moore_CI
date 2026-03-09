@@ -31,7 +31,7 @@ jobs:
         run: |
           cd src
           make clean || true
-          make fortran_compiler=ifx FFLAGS="-O2 -g0 -fno-sanitize=all" 2>&1 | tee build.log
+          make fortran_compiler=ifx FFLAGS="-O2" 2>&1 | tee build.log
       
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -47,15 +47,23 @@ jobs:
         run: |
           cd Benchmarks/wave
           rm -f run_wave_small.log wave_small_001.ENG wave_small_001.INF wave_small_000.MLG wave_small_001.MLG wave_small.PAR_001 wave_small.BMR wave_small.BMS wave_small.OUT wave_small.BRF_001 || true
-          export ASAN_OPTIONS=detect_leaks=0
-          export MSAN_OPTIONS=halt_on_error=0
-          ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log || true
+
+          ../../src/Anura3D.out wave_small 2>&1 | tee run_wave_small.log
+
           echo "==== current folder ===="
           pwd
+
           echo "==== wave folder contents ===="
           ls -lah
+
           echo "==== find ENG files ===="
           find . -maxdepth 2 -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT"
+
+          # FAIL CI if simulation did not generate ENG file
+          if [ ! -f wave_small_001.ENG ]; then
+            echo "ERROR: Simulation did not produce wave_small_001.ENG"
+            exit 1
+          fi
       
       - name: Upload wave benchmark outputs
         uses: actions/upload-artifact@v4
