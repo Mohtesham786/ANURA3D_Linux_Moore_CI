@@ -30,8 +30,9 @@ jobs:
       - name: Build Fortran code using Makefile
         run: |
           cd src
-          make clean || true
-          make fortran_compiler=ifx FFLAGS="-O2" 2>&1 | tee build.log
+           make clean || true
+           ifort --version || true
+           make fortran_compiler=ifort FFLAGS="-O2" 2>&1 | tee build.log
       
       - name: Set up Python
         uses: actions/setup-python@v4
