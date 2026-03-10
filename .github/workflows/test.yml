@@ -65,6 +65,34 @@ jobs:
             echo "ERROR: Simulation did not produce wave_small_001.ENG"
             exit 1
           fi
+
+      - name: Run Benchmark 4008 linear gravity
+        run: |
+          cd Benchmarks/Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D
+
+          echo "==== current folder ===="
+          pwd
+
+          echo "==== benchmark folder contents before run ===="
+          ls -lah
+
+          project_name=$(basename "$(ls *.CPS_001 | head -n1)" .CPS_001)
+          echo "Detected project name: $project_name"
+
+          rm -f run_4008.log *.ENG *.INF *.MLG *.OUT *.BRF_* *.PAR_* *.BMR *.BMS || true
+
+          ../../../../src/Anura3D.out "$project_name" 2>&1 | tee run_4008.log
+
+          echo "==== benchmark folder contents after run ===="
+          ls -lah
+
+          echo "==== generated result files ===="
+          find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
+
+          grep -q "Calculation finished." run_4008.log || {
+            echo "ERROR: 4008 benchmark did not finish successfully"
+            exit 1
+          }
       
       - name: Upload wave benchmark outputs
         uses: actions/upload-artifact@v4
