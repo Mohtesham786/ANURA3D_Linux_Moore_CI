@@ -58,41 +58,67 @@ jobs:
           ls -lah
 
           echo "==== find ENG files ===="
-          find . -maxdepth 2 -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT"
+          find . -maxdepth 2 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
 
           # FAIL CI if simulation did not generate ENG file
           if [ ! -f wave_small_001.ENG ]; then
             echo "ERROR: Simulation did not produce wave_small_001.ENG"
             exit 1
           fi
-
-      - name: Run Benchmark 4008 linear gravity
+      - name: Run selected pre-commit benchmarks
         run: |
-          cd Benchmarks/Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D
+          benchmarks=(
+            "Benchmarks/Pre-Commit_Tests/4007_lineartraction"
+            "Benchmarks/Pre-Commit_Tests/4008_lineargravity"
+            "Benchmarks/Pre-Commit_Tests/1001_Oedometer_QS_FEM_1Phase_NormalStress"
+          )
 
-          echo "==== current folder ===="
-          pwd
+          for bench in "${benchmarks[@]}"; do
+            echo "======================================"
+            echo "Running benchmark: $bench"
+            echo "======================================"
 
-          echo "==== benchmark folder contents before run ===="
-          ls -lah
+            a3d_dir=$(find "$bench" -maxdepth 2 -type d -name "*.A3D" | head -n1)
 
-          project_name=$(basename "$(ls *.CPS_001 | head -n1)" .CPS_001)
-          echo "Detected project name: $project_name"
+            if [ -z "$a3d_dir" ]; then
+              echo "ERROR: No .A3D folder found in $bench"
+              exit 1
+            fi
 
-          rm -f run_4008.log *.ENG *.INF *.MLG *.OUT *.BRF_* *.PAR_* *.BMR *.BMS || true
+            cd "$GITHUB_WORKSPACE/$a3d_dir"
 
-          ../../../../src/Anura3D.out "$project_name" 2>&1 | tee run_4008.log
+            echo "==== current folder ===="
+            pwd
 
-          echo "==== benchmark folder contents after run ===="
-          ls -lah
+            echo "==== benchmark folder contents before run ===="
+            ls -lah
 
-          echo "==== generated result files ===="
-          find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
+            project_name=$(basename "$(ls *.CPS_001 | head -n1)" .CPS_001)
 
-          grep -q "Calculation finished." run_4008.log || {
-            echo "ERROR: 4008 benchmark did not finish successfully"
-            exit 1
-          }
+            if [ -z "$project_name" ]; then
+              echo "ERROR: Could not detect project name in $a3d_dir"
+              exit 1
+            fi
+
+            echo "Detected A3D directory: $a3d_dir"
+            echo "Detected project name: $project_name"
+
+            rm -f run.log *.ENG *.INF *.MLG *.OUT *.BRF_* *.PAR_* *.BMR *.BMS || true
+
+            "$GITHUB_WORKSPACE/src/Anura3D.out" "$project_name" 2>&1 | tee run.log
+
+            echo "==== benchmark folder contents after run ===="
+            ls -lah
+
+            echo "==== generated result files ===="
+            find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
+
+            grep -q "Calculation finished." run.log || {
+              echo "ERROR: Benchmark failed: $bench"
+              exit 1
+            }
+          done
+      
       
       - name: Upload wave benchmark outputs
         uses: actions/upload-artifact@v4
