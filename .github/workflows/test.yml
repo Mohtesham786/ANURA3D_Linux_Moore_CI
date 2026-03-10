@@ -109,10 +109,11 @@ jobs:
 
             "$GITHUB_WORKSPACE/src/Anura3D.out" "$project_name" 2>&1 | tee run.log
 
-            grep -q "Calculation finished." run.log || {
-              echo "ERROR: Benchmark failed: $bench"
-              exit 1
-            }
+            if ! grep -q "Calculation finished." run.log; then
+              echo "FAILED: $bench" | tee -a "$GITHUB_WORKSPACE/failed_benchmarks.txt"
+              cd "$GITHUB_WORKSPACE"
+              continue
+            fi
 
             echo "==== generated result files ===="
             find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
