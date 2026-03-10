@@ -65,24 +65,25 @@ jobs:
             echo "ERROR: Simulation did not produce wave_small_001.ENG"
             exit 1
           fi
-      - name: Run selected pre-commit benchmarks
+      - name: Run all pre-commit benchmarks
         run: |
-          benchmarks=(
-            "Benchmarks/Pre-Commit_Tests/4007_lineartraction"
-            "Benchmarks/Pre-Commit_Tests/4008_lineargravity"
-            "Benchmarks/Pre-Commit_Tests/1001_Oedometer_QS_FEM_1Phase_NormalStress"
-          )
+          benchmark_root="$GITHUB_WORKSPACE/Benchmarks/Pre-Commit_Tests"
 
-          for bench in "${benchmarks[@]}"; do
+          find "$benchmark_root" -mindepth 1 -maxdepth 1 -type d | sort > benchmark_dirs.txt
+
+          echo "==== Benchmarks to run ===="
+          cat benchmark_dirs.txt
+
+          while IFS= read -r bench; do
             echo "======================================"
             echo "Running benchmark: $bench"
             echo "======================================"
 
-            a3d_dir=$(find "$GITHUB_WORKSPACE/$bench" -maxdepth 2 -type d -name "*.A3D" | head -n1)
+            a3d_dir=$(find "$bench" -maxdepth 2 -type d -name "*.A3D" | head -n1)
 
             if [ -z "$a3d_dir" ]; then
-              echo "ERROR: No .A3D folder found in $bench"
-              exit 1
+              echo "SKIP: No .A3D folder found in $bench"
+              continue
             fi
 
             cd "$a3d_dir"
@@ -93,11 +94,12 @@ jobs:
             echo "==== benchmark folder contents before run ===="
             ls -lah
 
-            project_name=$(basename "$(ls *.CPS_001 | head -n1)" .CPS_001)
+            project_name=$(basename "$(ls *.CPS_001 2>/dev/null | head -n1)" .CPS_001)
 
             if [ -z "$project_name" ]; then
-              echo "ERROR: Could not detect project name in $a3d_dir"
-              exit 1
+              echo "SKIP: Could not detect project name in $a3d_dir"
+              cd "$GITHUB_WORKSPACE"
+              continue
             fi
 
             echo "Detected A3D directory: $a3d_dir"
@@ -107,18 +109,16 @@ jobs:
 
             "$GITHUB_WORKSPACE/src/Anura3D.out" "$project_name" 2>&1 | tee run.log
 
-            echo "==== benchmark folder contents after run ===="
-            ls -lah
-
-            echo "==== generated result files ===="
-            find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
-
             grep -q "Calculation finished." run.log || {
               echo "ERROR: Benchmark failed: $bench"
               exit 1
             }
-          done
-      
+
+            echo "==== generated result files ===="
+            find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
+
+            cd "$GITHUB_WORKSPACE"
+          done < benchmark_dirs.txt
       
       - name: Upload wave benchmark outputs
         uses: actions/upload-artifact@v4
