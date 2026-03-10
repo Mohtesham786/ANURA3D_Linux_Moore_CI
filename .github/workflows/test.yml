@@ -78,14 +78,14 @@ jobs:
             echo "Running benchmark: $bench"
             echo "======================================"
 
-            a3d_dir=$(find "$bench" -maxdepth 2 -type d -name "*.A3D" | head -n1)
+            a3d_dir=$(find "$GITHUB_WORKSPACE/$bench" -maxdepth 2 -type d -name "*.A3D" | head -n1)
 
             if [ -z "$a3d_dir" ]; then
               echo "ERROR: No .A3D folder found in $bench"
               exit 1
             fi
 
-            cd "$GITHUB_WORKSPACE/$a3d_dir"
+            cd "$a3d_dir"
 
             echo "==== current folder ===="
             pwd
