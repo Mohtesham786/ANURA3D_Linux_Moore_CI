@@ -42,10 +42,6 @@ def compare_files(file1_path, file2_path):
     # print the actual file
     print(file1_path)
 
-    # Write all lines to the output file
-    with open("test.out", 'w') as output_file:
-        output_file.writelines(lines1)
-
     for i in range(max_lines):
         # Get the line i of the file if i is not greater than the length of the file
         line1 = lines1[i].strip() if i < len(lines1) else None
@@ -101,26 +97,48 @@ def run_comparisons():
 
     script_dir = os.path.dirname(__file__)
 
-    # Construct the relative path to wave_small.out
-    wave_folder_path = os.path.join(script_dir, '../wave/')
-
-    # Construct the benchmark folder path
+    # Benchmark root folder
     benchmark_folder_path = os.path.join(script_dir, "../")
 
-    print(os.listdir(benchmark_folder_path))
+    print("Benchmark root:", benchmark_folder_path)
+    print("Folders inside benchmark root:", os.listdir(benchmark_folder_path))
 
-    # Path relative to the Benchmark folder
+    # Add explicit test cases here
     test_cases = [
-        ("wave/wave_small_001.ENG", "wave/wave_small_001_expected.ENG")
+        # Existing wave ENG comparison
+        ("wave/wave_small_001.ENG", "wave/wave_small_001_expected.ENG"),
 
-        # Add more test cases as needed
+        # Example BMR/BMS comparisons
+        # Replace these expected file names with your real stored reference files
+        ("Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad.BMR",
+         "Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad_expected.BMR"),
+
+        ("Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad.BMS",
+         "Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad_expected.BMS"),
+
+        ("Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad.BMR",
+         "Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad_expected.BMR"),
+
+        ("Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad.BMS",
+         "Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad_expected.BMS"),
     ]
 
     all_passed = True
+
     for actual_file, expected_file in test_cases:
-        # Construct the full path for the actual and the expected file 
         actual_file = os.path.join(benchmark_folder_path, actual_file)
         expected_file = os.path.join(benchmark_folder_path, expected_file)
+
+        # Check file existence first
+        if not os.path.exists(actual_file):
+            print(f"FAILED: actual file not found: {actual_file}")
+            all_passed = False
+            continue
+
+        if not os.path.exists(expected_file):
+            print(f"FAILED: expected file not found: {expected_file}")
+            all_passed = False
+            continue
 
         passed, message = compare_files(actual_file, expected_file)
 
@@ -128,9 +146,9 @@ def run_comparisons():
         print(f"  {'PASSED' if passed else 'FAILED'}: {message}")
 
         all_passed = all_passed and passed
-    
-    return all_passed
 
+    return all_passed
+    
 if __name__ == "__main__":
     # Run the comparisons
     all_passed = run_comparisons()
