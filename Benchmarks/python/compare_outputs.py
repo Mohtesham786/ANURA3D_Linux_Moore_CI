@@ -98,7 +98,7 @@ def run_comparisons():
     script_dir = os.path.dirname(__file__)
 
     # Benchmark root folder
-    benchmark_folder_path = os.path.join(script_dir, "../")
+    benchmark_folder_path = os.path.abspath(os.path.join(script_dir, ".."))
 
     print("Benchmark root:", benchmark_folder_path)
     print("Folders inside benchmark root:", os.listdir(benchmark_folder_path))
