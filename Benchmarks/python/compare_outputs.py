@@ -44,8 +44,8 @@ def compare_files(file1_path, file2_path):
 
     for i in range(max_lines):
         # Get the line i of the file if i is not greater than the length of the file
-        line1 = " ".join(lines1[i].split()) if i < len(lines1) else None
-        line2 = " ".join(lines2[i].split()) if i < len(lines2) else None
+        line1 = " ".join(lines1[i].split()) if i < len(lines1) else ""
+        line2 = " ".join(lines2[i].split()) if i < len(lines2) else ""
         if line1 != line2:
             differences.append((i + 1, line1, line2))
     
@@ -93,59 +93,54 @@ def compare_file_as_dfs(file_1_path, file_2_path, tolerance = 1e-4):
     return passed, message
 
 def run_comparisons():
-    """Run comparisons for all test cases."""
+    """Run comparisons for all expected benchmark files automatically."""
+
+    import glob
 
     script_dir = os.path.dirname(__file__)
+    benchmark_root = os.path.abspath(os.path.join(script_dir, "..", "Pre-Commit_Tests"))
 
-    # Benchmark root folder
-    benchmark_folder_path = os.path.abspath(os.path.join(script_dir, ".."))
-
-    print("Benchmark root:", benchmark_folder_path)
-    print("Folders inside benchmark root:", os.listdir(benchmark_folder_path))
-
-    # Add explicit test cases here
-    test_cases = [
-        # Existing wave ENG comparison
-        ("wave/wave_small_001.ENG", "wave/wave_small_001_expected.ENG"),
-
-        # Example BMR/BMS comparisons
-        # Replace these expected file names with your real stored reference files
-        ("Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad.BMR",
-         "Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad_expected.BMR"),
-
-        ("Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad.BMS",
-         "Pre-Commit_Tests/4007_lineartraction/LinearLoad.A3D/LinearLoad_expected.BMS"),
-
-        ("Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad.BMR",
-         "Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad_expected.BMR"),
-
-        ("Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad.BMS",
-         "Pre-Commit_Tests/4008_lineargravity/LinearLoad.A3D/LinearLoad_expected.BMS"),
-    ]
+    print("Benchmark root:", benchmark_root)
 
     all_passed = True
+    compared_any = False
 
-    for actual_file, expected_file in test_cases:
-        actual_file = os.path.join(benchmark_folder_path, actual_file)
-        expected_file = os.path.join(benchmark_folder_path, expected_file)
+    benchmark_dirs = sorted(
+        d for d in glob.glob(os.path.join(benchmark_root, "*")) if os.path.isdir(d)
+    )
 
-        # Check file existence first
-        if not os.path.exists(actual_file):
-            print(f"FAILED: actual file not found: {actual_file}")
-            all_passed = False
+    for bench in benchmark_dirs:
+        a3d_dirs = glob.glob(os.path.join(bench, "*.A3D"))
+        if not a3d_dirs:
             continue
 
-        if not os.path.exists(expected_file):
-            print(f"FAILED: expected file not found: {expected_file}")
-            all_passed = False
-            continue
+        a3d_dir = a3d_dirs[0]
+        print(f"\n=== Checking benchmark: {a3d_dir} ===")
 
-        passed, message = compare_files(actual_file, expected_file)
+        expected_files = sorted(
+            glob.glob(os.path.join(a3d_dir, "*_expected.BMR")) +
+            glob.glob(os.path.join(a3d_dir, "*_expected.BMS"))
+        )
 
-        print(f"Comparing {actual_file} with {expected_file}:")
-        print(f"  {'PASSED' if passed else 'FAILED'}: {message}")
+        for expected_file in expected_files:
+            compared_any = True
+            actual_file = expected_file.replace("_expected", "")
 
-        all_passed = all_passed and passed
+            if not os.path.exists(actual_file):
+                print(f"FAILED: actual file not found: {actual_file}")
+                all_passed = False
+                continue
+
+            passed, message = compare_files(actual_file, expected_file)
+
+            print(f"Comparing {actual_file} with {expected_file}:")
+            print(f"  {'PASSED' if passed else 'FAILED'}: {message}")
+
+            all_passed = all_passed and passed
+
+    if not compared_any:
+        print("No expected benchmark files were found.")
+        return False
 
     return all_passed
     
