@@ -53,7 +53,7 @@ def compare_files(file1_path, file2_path):
         passed = False
         message = "The test failed. The differences are: \n" + \
                    "Line #    ---- Actual -----   ---- Expected ----- \n" + \
-                   "\n".join(map(str, differences)) + "\n"
+                   "\n".join(map(str, differences[:10])) + "\n"
     else:
         passed = True
         message = "The test passed"
@@ -93,20 +93,51 @@ def compare_file_as_dfs(file_1_path, file_2_path, tolerance = 1e-4):
     return passed, message
 
 def run_comparisons():
-    """Run comparisons for all expected benchmark files automatically."""
+    """Run comparisons for wave ENG and all expected benchmark files automatically."""
 
     import glob
 
     script_dir = os.path.dirname(__file__)
-    benchmark_root = os.path.abspath(os.path.join(script_dir, "..", "Pre-Commit_Tests"))
+    benchmark_root = os.path.abspath(os.path.join(script_dir, ".."))
+    precommit_root = os.path.join(benchmark_root, "Pre-Commit_Tests")
 
     print("Benchmark root:", benchmark_root)
 
     all_passed = True
     compared_any = False
+    passed_count = 0
+    failed_count = 0
 
+    # -------------------------------------------------
+    # 1. Compare wave ENG file
+    # -------------------------------------------------
+    wave_actual = os.path.join(benchmark_root, "wave", "wave_small_001.ENG")
+    wave_expected = os.path.join(benchmark_root, "wave", "wave_small_001_expected.ENG")
+
+    if os.path.exists(wave_actual) and os.path.exists(wave_expected):
+        compared_any = True
+        passed, message = compare_files(wave_actual, wave_expected)
+
+        status = "PASSED" if passed else "FAILED"
+        print(f"[{status}] {wave_actual}")
+
+        if not passed:
+            print(message)
+            failed_count += 1
+        else:
+            passed_count += 1
+
+        all_passed = all_passed and passed
+    else:
+        print("FAILED: wave ENG comparison files not found")
+        all_passed = False
+        failed_count += 1
+
+    # -------------------------------------------------
+    # 2. Compare all Pre-Commit_Tests expected BMR/BMS
+    # -------------------------------------------------
     benchmark_dirs = sorted(
-        d for d in glob.glob(os.path.join(benchmark_root, "*")) if os.path.isdir(d)
+        d for d in glob.glob(os.path.join(precommit_root, "*")) if os.path.isdir(d)
     )
 
     for bench in benchmark_dirs:
@@ -127,14 +158,21 @@ def run_comparisons():
             actual_file = expected_file.replace("_expected", "")
 
             if not os.path.exists(actual_file):
-                print(f"FAILED: actual file not found: {actual_file}")
+                print(f"[FAILED] actual file not found: {actual_file}")
                 all_passed = False
+                failed_count += 1
                 continue
 
             passed, message = compare_files(actual_file, expected_file)
 
-            print(f"Comparing {actual_file} with {expected_file}:")
-            print(f"  {'PASSED' if passed else 'FAILED'}: {message}")
+            status = "PASSED" if passed else "FAILED"
+            print(f"[{status}] {actual_file}")
+
+            if not passed:
+                print(message)
+                failed_count += 1
+            else:
+                passed_count += 1
 
             all_passed = all_passed and passed
 
@@ -142,6 +180,7 @@ def run_comparisons():
         print("No expected benchmark files were found.")
         return False
 
+    print(f"\nSummary: {passed_count} passed, {failed_count} failed")
     return all_passed
     
 if __name__ == "__main__":
