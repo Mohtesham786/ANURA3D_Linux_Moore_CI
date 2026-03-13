@@ -106,7 +106,6 @@ def run_comparisons():
     compared_any = False
     passed_count = 0
     failed_count = 0
-    skipped_count = 0
 
     # -------------------------------------------------
     # 1. Compare wave ENG file
@@ -134,64 +133,50 @@ def run_comparisons():
         failed_count += 1
 
     # -------------------------------------------------
-    # 2. Compare all Pre-Commit_Tests expected files
+    # 2. Compare all expected BMR/BMS/BM files recursively
     # -------------------------------------------------
-    benchmark_dirs = sorted(
-        d for d in glob.glob(os.path.join(precommit_root, "*")) if os.path.isdir(d)
+    expected_files = sorted(
+        glob.glob(os.path.join(precommit_root, "**", "*_expected.BMR"), recursive=True) +
+        glob.glob(os.path.join(precommit_root, "**", "*_expected.BMS"), recursive=True) +
+        glob.glob(os.path.join(precommit_root, "**", "*_expected.BM"), recursive=True)
     )
 
-    for bench in benchmark_dirs:
-        a3d_dirs = sorted(glob.glob(os.path.join(bench, "*.A3D")))
+    if not expected_files:
+        print("No expected BMR/BMS/BM files were found in Pre-Commit_Tests.")
+    else:
+        for expected_file in expected_files:
+            actual_file = expected_file.replace("_expected", "")
 
-        if not a3d_dirs:
-            print(f"[SKIPPED] No .A3D folder found in {bench}")
-            skipped_count += 1
-            continue
+            print(f"\nComparing:")
+            print(f"  actual   = {actual_file}")
+            print(f"  expected = {expected_file}")
 
-        for a3d_dir in a3d_dirs:
-            print(f"\n=== Checking benchmark: {a3d_dir} ===")
+            compared_any = True
 
-            expected_files = sorted(
-                glob.glob(os.path.join(a3d_dir, "*_expected.BMR")) +
-                glob.glob(os.path.join(a3d_dir, "*_expected.BMS")) +
-                glob.glob(os.path.join(a3d_dir, "*_expected.BM"))
-            )
-
-            if not expected_files:
-                print(f"[SKIPPED] No expected comparison files found in {a3d_dir}")
-                skipped_count += 1
+            if not os.path.exists(actual_file):
+                print(f"[FAILED] actual file not found: {actual_file}")
+                all_passed = False
+                failed_count += 1
                 continue
 
-            for expected_file in expected_files:
-                actual_file = expected_file.replace("_expected", "")
-                print(f"Comparing:\n  actual   = {actual_file}\n  expected = {expected_file}")
+            passed, message = compare_files(actual_file, expected_file)
 
-                compared_any = True
+            status = "PASSED" if passed else "FAILED"
+            print(f"[{status}] {actual_file}")
 
-                if not os.path.exists(actual_file):
-                    print(f"[FAILED] actual file not found: {actual_file}")
-                    all_passed = False
-                    failed_count += 1
-                    continue
+            if not passed:
+                print(message)
+                failed_count += 1
+            else:
+                passed_count += 1
 
-                passed, message = compare_files(actual_file, expected_file)
-
-                status = "PASSED" if passed else "FAILED"
-                print(f"[{status}] {actual_file}")
-
-                if not passed:
-                    print(message)
-                    failed_count += 1
-                else:
-                    passed_count += 1
-
-                all_passed = all_passed and passed
+            all_passed = all_passed and passed
 
     if not compared_any:
-        print("No expected benchmark files were found.")
+        print("No benchmark comparisons were performed.")
         return False
 
-    print(f"\nSummary: {passed_count} passed, {failed_count} failed, {skipped_count} skipped")
+    print(f"\nSummary: {passed_count} passed, {failed_count} failed")
     return all_passed
     
 if __name__ == "__main__":
