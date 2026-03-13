@@ -94,7 +94,6 @@ def compare_file_as_dfs(file_1_path, file_2_path, tolerance = 1e-4):
 
 def run_comparisons():
     """Run comparisons for wave ENG and all expected benchmark files automatically."""
-
     import glob
 
     script_dir = os.path.dirname(__file__)
@@ -107,6 +106,7 @@ def run_comparisons():
     compared_any = False
     passed_count = 0
     failed_count = 0
+    skipped_count = 0
 
     # -------------------------------------------------
     # 1. Compare wave ENG file
@@ -129,58 +129,69 @@ def run_comparisons():
 
         all_passed = all_passed and passed
     else:
-        print("FAILED: wave ENG comparison files not found")
+        print("[FAILED] wave ENG comparison files not found")
         all_passed = False
         failed_count += 1
 
     # -------------------------------------------------
-    # 2. Compare all Pre-Commit_Tests expected BMR/BMS
+    # 2. Compare all Pre-Commit_Tests expected files
     # -------------------------------------------------
     benchmark_dirs = sorted(
         d for d in glob.glob(os.path.join(precommit_root, "*")) if os.path.isdir(d)
     )
 
     for bench in benchmark_dirs:
-        a3d_dirs = glob.glob(os.path.join(bench, "*.A3D"))
+        a3d_dirs = sorted(glob.glob(os.path.join(bench, "*.A3D")))
+
         if not a3d_dirs:
+            print(f"[SKIPPED] No .A3D folder found in {bench}")
+            skipped_count += 1
             continue
 
-        a3d_dir = a3d_dirs[0]
-        print(f"\n=== Checking benchmark: {a3d_dir} ===")
+        for a3d_dir in a3d_dirs:
+            print(f"\n=== Checking benchmark: {a3d_dir} ===")
 
-        expected_files = sorted(
-            glob.glob(os.path.join(a3d_dir, "*_expected.BMR")) +
-            glob.glob(os.path.join(a3d_dir, "*_expected.BMS"))
-        )
+            expected_files = sorted(
+                glob.glob(os.path.join(a3d_dir, "*_expected.BMR")) +
+                glob.glob(os.path.join(a3d_dir, "*_expected.BMS")) +
+                glob.glob(os.path.join(a3d_dir, "*_expected.BM"))
+            )
 
-        for expected_file in expected_files:
-            compared_any = True
-            actual_file = expected_file.replace("_expected", "")
-
-            if not os.path.exists(actual_file):
-                print(f"[FAILED] actual file not found: {actual_file}")
-                all_passed = False
-                failed_count += 1
+            if not expected_files:
+                print(f"[SKIPPED] No expected comparison files found in {a3d_dir}")
+                skipped_count += 1
                 continue
 
-            passed, message = compare_files(actual_file, expected_file)
+            for expected_file in expected_files:
+                actual_file = expected_file.replace("_expected", "")
+                print(f"Comparing:\n  actual   = {actual_file}\n  expected = {expected_file}")
 
-            status = "PASSED" if passed else "FAILED"
-            print(f"[{status}] {actual_file}")
+                compared_any = True
 
-            if not passed:
-                print(message)
-                failed_count += 1
-            else:
-                passed_count += 1
+                if not os.path.exists(actual_file):
+                    print(f"[FAILED] actual file not found: {actual_file}")
+                    all_passed = False
+                    failed_count += 1
+                    continue
 
-            all_passed = all_passed and passed
+                passed, message = compare_files(actual_file, expected_file)
+
+                status = "PASSED" if passed else "FAILED"
+                print(f"[{status}] {actual_file}")
+
+                if not passed:
+                    print(message)
+                    failed_count += 1
+                else:
+                    passed_count += 1
+
+                all_passed = all_passed and passed
 
     if not compared_any:
         print("No expected benchmark files were found.")
         return False
 
-    print(f"\nSummary: {passed_count} passed, {failed_count} failed")
+    print(f"\nSummary: {passed_count} passed, {failed_count} failed, {skipped_count} skipped")
     return all_passed
     
 if __name__ == "__main__":
