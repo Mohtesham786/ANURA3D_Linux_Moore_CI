@@ -116,7 +116,7 @@ jobs:
             fi
 
             echo "==== generated result files ===="
-            find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" \)
+            find . -maxdepth 1 \( -name "*.ENG" -o -name "*.INF" -o -name "*.MLG" -o -name "*.OUT" -o -name "*.BMR" -o -name "*.BMS" -o -name "*.BM" \)
 
             cd "$GITHUB_WORKSPACE"
           done < benchmark_dirs.txt
