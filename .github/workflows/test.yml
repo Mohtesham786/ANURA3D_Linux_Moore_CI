@@ -105,7 +105,7 @@ jobs:
             echo "Detected A3D directory: $a3d_dir"
             echo "Detected project name: $project_name"
 
-            rm -f run.log *.ENG *.INF *.MLG *.OUT *.BRF_* *.PAR_* || true
+            rm -f run.log *.ENG *.INF *.MLG *.OUT *.BRF_* *.PAR_* *.BMR *.BMS *.BM || true
 
             "$GITHUB_WORKSPACE/src/Anura3D.out" "$project_name" 2>&1 | tee run.log
 
