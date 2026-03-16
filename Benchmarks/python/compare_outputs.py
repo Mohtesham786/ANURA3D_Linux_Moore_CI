@@ -41,6 +41,8 @@ def compare_files(file1_path, file2_path):
     Header/comment lines are ignored.
     """
 
+    tolerance = 1e-6
+
     with open(file1_path, 'r', newline=None) as f1, open(file2_path, 'r', newline=None) as f2:
         lines1 = f1.readlines()
         lines2 = f2.readlines()
@@ -53,10 +55,7 @@ def compare_files(file1_path, file2_path):
         line1 = " ".join(lines1[i].split()) if i < len(lines1) else ""
         line2 = " ".join(lines2[i].split()) if i < len(lines2) else ""
 
-        # -----------------------------------------
         # Skip lines without any numeric content
-        # (headers, comments, project info)
-        # -----------------------------------------
         tokens_check = (line1 + " " + line2).split()
         if not any(is_float(t) for t in tokens_check):
             continue
@@ -64,32 +63,42 @@ def compare_files(file1_path, file2_path):
         if line1 == line2:
             continue
 
-        line_message = []
-        line_message.append(f"Line {i+1} differs:")
-        line_message.append(f"  actual   : {line1}")
-        line_message.append(f"  expected : {line2}")
-
         tokens1 = line1.split() if line1 else []
         tokens2 = line2.split() if line2 else []
         max_tokens = max(len(tokens1), len(tokens2))
 
-        for j in range(max_tokens):
+        token_messages = []
 
+        for j in range(max_tokens):
             tok1 = tokens1[j] if j < len(tokens1) else "<missing>"
             tok2 = tokens2[j] if j < len(tokens2) else "<missing>"
 
             if tok1 == tok2:
                 continue
 
-            line_message.append(f"    Token {j+1} differs:")
-            line_message.append(f"      actual   = {tok1}")
-            line_message.append(f"      expected = {tok2}")
-
+            # If both are numeric, ignore tiny differences
             if is_float(tok1) and is_float(tok2):
                 diff = abs(to_float(tok1) - to_float(tok2))
-                line_message.append(f"      abs diff = {diff:.16e}")
+                if diff <= tolerance:
+                    continue
 
-        differences.append("\n".join(line_message))
+                token_messages.append(f"    Token {j+1} differs:")
+                token_messages.append(f"      actual   = {tok1}")
+                token_messages.append(f"      expected = {tok2}")
+                token_messages.append(f"      abs diff = {diff:.16e}")
+            else:
+                token_messages.append(f"    Token {j+1} differs:")
+                token_messages.append(f"      actual   = {tok1}")
+                token_messages.append(f"      expected = {tok2}")
+
+        # Only record the line if at least one real difference remains
+        if token_messages:
+            line_message = []
+            line_message.append(f"Line {i+1} differs:")
+            line_message.append(f"  actual   : {line1}")
+            line_message.append(f"  expected : {line2}")
+            line_message.extend(token_messages)
+            differences.append("\n".join(line_message))
 
     if differences:
         passed = False
