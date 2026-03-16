@@ -158,6 +158,7 @@ def run_comparisons():
             print(message)
             failed_count += 1
         else:
+            print(message)
             passed_count += 1
 
         all_passed = all_passed and passed
@@ -202,6 +203,7 @@ def run_comparisons():
                 print(message)
                 failed_count += 1
             else:
+                print(message)
                 passed_count += 1
 
             all_passed = all_passed and passed
