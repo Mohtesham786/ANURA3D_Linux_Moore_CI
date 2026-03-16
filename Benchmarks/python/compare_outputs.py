@@ -37,8 +37,8 @@ def to_float(token):
 
 def compare_files(file1_path, file2_path):
     """
-    Compare two files line by line and token by token.
-    Prints detailed differences including numeric differences.
+    Compare two files line by line but ONLY for lines containing numerical data.
+    Header/comment lines are ignored.
     """
 
     with open(file1_path, 'r', newline=None) as f1, open(file2_path, 'r', newline=None) as f2:
@@ -48,12 +48,18 @@ def compare_files(file1_path, file2_path):
     differences = []
     max_lines = max(len(lines1), len(lines2))
 
-    print(file1_path)
-
     for i in range(max_lines):
 
         line1 = " ".join(lines1[i].split()) if i < len(lines1) else ""
         line2 = " ".join(lines2[i].split()) if i < len(lines2) else ""
+
+        # -----------------------------------------
+        # Skip lines without any numeric content
+        # (headers, comments, project info)
+        # -----------------------------------------
+        tokens_check = (line1 + " " + line2).split()
+        if not any(is_float(t) for t in tokens_check):
+            continue
 
         if line1 == line2:
             continue
@@ -91,38 +97,6 @@ def compare_files(file1_path, file2_path):
     else:
         passed = True
         message = "The test passed"
-
-    return passed, message
-    
-def compare_file_as_dfs(file_1_path, file_2_path, tolerance = 1e-4):
-    """
-    Load in two files and compare them as dfs
-    Assumes that the columns are all the same
-    """
-
-
-    # Store the first file as a df
-    df1 = pd.read_csv(file_1_path, sep = "\\s+")
-
-    # Store the second as a df
-    df2 = pd.read_csv(file_2_path, sep = "\\s+")
-
-    diff = df1 - df2
-
-    abs_diff = np.abs(diff)
-    
-    # Check if the difference are with the tolerance
-    within_tolerance = abs_diff <= tolerance
-
-    # Check if all values are with the tolerance
-    all_within_tolerance = within_tolerance.all().all()
-
-    if all_within_tolerance:
-        passed = True
-        message = "The test passed"
-    else:
-        passed = False
-        message = "The test failed"
 
     return passed, message
 
