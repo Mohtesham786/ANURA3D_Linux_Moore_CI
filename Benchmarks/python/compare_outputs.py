@@ -23,43 +23,77 @@ import pandas as pd
     
 #     return True, "Outputs match"
 
+def is_float(token):
+    """Return True if token can be converted to float."""
+    try:
+        float(token.replace("D", "E"))
+        return True
+    except ValueError:
+        return False
+
+def to_float(token):
+    """Convert Fortran-style float text to Python float."""
+    return float(token.replace("D", "E"))
+
 def compare_files(file1_path, file2_path):
     """
-    Compare the files passed in. If they don't match set passed to false and return the information that is different
+    Compare two files line by line and token by token.
+    Prints detailed differences including numeric differences.
     """
 
-    # Open the files and read all of the lines
     with open(file1_path, 'r', newline=None) as f1, open(file2_path, 'r', newline=None) as f2:
         lines1 = f1.readlines()
         lines2 = f2.readlines()
-    
-    # Init list to track the differences between the files
-    differences = []
 
-    # Get the max number of lines in 
+    differences = []
     max_lines = max(len(lines1), len(lines2))
-    
-    # print the actual file
+
     print(file1_path)
 
     for i in range(max_lines):
-        # Get the line i of the file if i is not greater than the length of the file
+
         line1 = " ".join(lines1[i].split()) if i < len(lines1) else ""
         line2 = " ".join(lines2[i].split()) if i < len(lines2) else ""
-        if line1 != line2:
-            differences.append((i + 1, line1, line2))
-    
-    if len(differences) > 0:
+
+        if line1 == line2:
+            continue
+
+        line_message = []
+        line_message.append(f"Line {i+1} differs:")
+        line_message.append(f"  actual   : {line1}")
+        line_message.append(f"  expected : {line2}")
+
+        tokens1 = line1.split() if line1 else []
+        tokens2 = line2.split() if line2 else []
+        max_tokens = max(len(tokens1), len(tokens2))
+
+        for j in range(max_tokens):
+
+            tok1 = tokens1[j] if j < len(tokens1) else "<missing>"
+            tok2 = tokens2[j] if j < len(tokens2) else "<missing>"
+
+            if tok1 == tok2:
+                continue
+
+            line_message.append(f"    Token {j+1} differs:")
+            line_message.append(f"      actual   = {tok1}")
+            line_message.append(f"      expected = {tok2}")
+
+            if is_float(tok1) and is_float(tok2):
+                diff = abs(to_float(tok1) - to_float(tok2))
+                line_message.append(f"      abs diff = {diff:.16e}")
+
+        differences.append("\n".join(line_message))
+
+    if differences:
         passed = False
-        message = "The test failed. The differences are: \n" + \
-                   "Line #    ---- Actual -----   ---- Expected ----- \n" + \
-                   "\n".join(map(str, differences[:10])) + "\n"
+        message = "The test failed. Differences:\n\n" + "\n\n".join(differences[:10])
     else:
         passed = True
         message = "The test passed"
 
     return passed, message
-
+    
 def compare_file_as_dfs(file_1_path, file_2_path, tolerance = 1e-4):
     """
     Load in two files and compare them as dfs
